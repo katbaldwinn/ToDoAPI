@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+
+
+
 namespace ToDoAPI
 {
 	public class Program
@@ -8,10 +12,26 @@ namespace ToDoAPI
 
 			// Add services to the container.
 
+			//CORS FUNCTIONALITY ( Cross Origin Resource SHaring - used to block websites from requesting data unless permission is granted)
+			builder.Services.AddCors(options =>
+			{
+				options.AddDefaultPolicy(policy =>
+				{
+					policy.WithOrigins("OriginPolicy", "http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
+				});
+			});
+
 			builder.Services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
+
+
+			builder.Services.AddDbContext<ToDoAPI.Models.ToDoContext>( options=>
+				{
+					options.UseSqlServer(builder.Configuration.GetConnectionString("ToDoDB"));
+			});
+
 
 			var app = builder.Build();
 
@@ -28,6 +48,8 @@ namespace ToDoAPI
 
 
 			app.MapControllers();
+
+			app.UseCors();
 
 			app.Run();
 		}
